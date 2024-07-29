@@ -1,6 +1,6 @@
 image:
-  repository: woutthenines/velero-backup-notification
-  tag: v1.0.3
+  repository: ard3ny/velero-backup-notification
+  tag: v1.0.4
 
 slack:
   enabled: false
@@ -12,6 +12,7 @@ slack:
 discord:
   enabled: false
   failures_only: true
+  partially_failures_counts_as_complete: false
   webhook: "https://...."
   mentions:
     enabled: false
