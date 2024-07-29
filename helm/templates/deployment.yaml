@@ -56,8 +56,6 @@ spec:
               value: {{ .Values.discord.enabled | quote }}
             - name: DISCORD_FAILURES_ONLY
               value: {{ .Values.discord.failures_only | quote }}
-            - name: DISCORD_PARTIALLY_FAILURES_COUNT_AS_COMPLETE
-              value: {{ .Values.discord.partially_failures_counts_as_complete | quote }}
             - name: DISCORD_WEBHOOK
               valueFrom:
                 secretKeyRef:

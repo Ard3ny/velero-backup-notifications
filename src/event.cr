@@ -106,8 +106,7 @@ class Event
       end
 
       failures_only = DISCORD_MENTIONS_FAILURES_ONLY == "true"
-      partially_failures_count_as_complete = ENV.fetch("PARTIALLY_FAILURES_COUNT_AS_COMPLETE", "false").downcase == "true"
-      succeeded = phase == "Completed" || (partially_failures_count_as_complete && phase == "PartiallyFailed")
+      succeeded = phase == "Completed"
 
       notification_mention = !failures_only || (failures_only && !succeeded) ? "<@&#{DISCORD_MENTIONS_ROLE_ID}>" : nil
     end
