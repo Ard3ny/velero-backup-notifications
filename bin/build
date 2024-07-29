@@ -3,7 +3,7 @@
 docker run --rm -it --platform=linux/amd64 -v $(pwd):/workspace -w /workspace crystallang/crystal:latest-alpine /bin/sh -c "shards install && crystal run ./lib/k8s/bin/gen_crd.cr -- ./crds.yaml ./src/crds && crystal build src/velero-notifications.cr --static"
 
 
-IMAGE="woutthenines/velero-backup-notification"
+IMAGE="ard3ny/velero-backup-notification"
 VERSION="$(git describe --tags --abbrev=0)"
 
 docker build --platform=linux -t ${IMAGE}:${VERSION} .

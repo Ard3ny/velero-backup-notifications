@@ -1,16 +1,6 @@
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/vitobotta/velero-notifications)
-![GitHub Release Date](https://img.shields.io/github/release-date/vitobotta/velero-notifications)
-![GitHub last commit](https://img.shields.io/github/last-commit/vitobotta/velero-notifications)
-![GitHub issues](https://img.shields.io/github/issues-raw/vitobotta/velero-notifications)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/vitobotta/velero-notifications)
-![GitHub](https://img.shields.io/github/license/vitobotta/velero-notifications)
-![GitHub Discussions](https://img.shields.io/github/discussions/vitobotta/velero-notifications)
-![GitHub top language](https://img.shields.io/github/languages/top/vitobotta/velero-notifications)
+## Disclaimer 
 
-![GitHub forks](https://img.shields.io/github/forks/vitobotta/velero-notifications?style=social)
-![GitHub Repo stars](https://img.shields.io/github/stars/vitobotta/velero-notifications?style=social)
-
-
+This repository is a fork originally created from [vitobotta](https://github.com/vitobotta/velero-notifications). Later [wout-o](https://github.com/wout-o/velero-notifications) added feature for discord webhooks.
 
 # velero-notifications
 
@@ -20,12 +10,13 @@ This is a simple Kubernetes controller written in Crystal that sends Email/Slack
 
 ![Screenshot](discord.png?raw=true "Screenshot")
 
-If you like this or any of my other projects and would like to help with their development, consider [becoming a sponsor](https://github.com/sponsors/vitobotta).
 
 ## Installation
 
-- Clone the repo
-- Install with Helm
+1. Clone the repo
+2. Install with Helm 
+
+Don't forget to change namespace && velero_namespace to your values.
 
 ```bash
 helm upgrade --install \
@@ -50,7 +41,7 @@ helm upgrade --install \
   --set email.smtp.username=... \
   --set email.smtp.password=... \
   --set email.from_address=... \
-  --set email.to_address=...
+  --set email.to_address=... \
   --set webhook.enabled=true \
   --set webhook.failures_only=false \
   --set webhook.url=https://... \
@@ -60,13 +51,12 @@ helm upgrade --install \
 That's it! You should now receive notifications when a backup is completed or fails. It couldn't be simpler than that!
 
 
+## Quick guide on how to integrate with
+* webhook (azure logic app, [healthchecks.io)](https://healthchecks.io/))
+* discord webhook
+...
 
 ## License
 
 [MIT License](https://github.com/vitobotta/velero-notifications/blob/main/LICENSE)
 
-
-
-## Stargazers over time
-
-[![Stargazers over time](https://starchart.cc/vitobotta/velero-notifications.svg)](https://starchart.cc/vitobotta/velero-notifications)
