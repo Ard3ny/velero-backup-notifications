@@ -36,6 +36,8 @@ spec:
               value: {{ .Release.Namespace }}
             - name: NOTIFICATION_PREFIX
               value: {{ .Values.notification_prefix | quote }}
+            - name: PARTIALLY_FAILED_COUNT_AS_COMPLETED
+              value: {{ .Values.partially_failed_count_as_completed | quote }}
             - name: ENABLE_SLACK_NOTIFICATIONS
               value: {{ .Values.slack.enabled | quote }}
             - name: SLACK_FAILURES_ONLY

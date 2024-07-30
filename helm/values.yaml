@@ -1,6 +1,6 @@
 image:
   repository: ard3ny/velero-backup-notification
-  tag: v1.0.4
+  tag: v1.0.5
 
 slack:
   enabled: false
@@ -11,9 +11,8 @@ slack:
 
 discord:
   enabled: false
-  failures_only: true
-  partially_failures_counts_as_complete: false
-  webhook: "https://...."
+  failures_only: false
+  webhook: "https://discord.com/api/webhooks/1267393565131280434/1c5vBQoZEWD3nTfYlpiCrOhGyvZ0PIhXqK0_nPkwLvcyPHeH5S8pgM4gNJQuvJEREsiB"
   mentions:
     enabled: false
     failures_only: true
@@ -36,6 +35,6 @@ webhook:
   failures_only: false
   url: "https://...."
 
-velero_namespace: velero
-
+velero_namespace: filip-velero
+partially_failed_count_as_completed: false
 notification_prefix: "[Velero] "

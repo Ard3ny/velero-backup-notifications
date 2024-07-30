@@ -5,6 +5,7 @@ require "email"
 class Event
   SLACK_WEBHOOK = ENV.fetch("SLACK_WEBHOOK", "")
   DISCORD_WEBHOOK = ENV.fetch("DISCORD_WEBHOOK", "")
+  PARTIALLY_FAILED_COUNT_AS_COMPLETED = ENV.fetch("PARTIALLY_FAILED_COUNT_AS_COMPLETED", "false")
   ENABLE_DISCORD_MENTIONS = ENV.fetch("ENABLE_DISCORD_MENTIONS", "false").downcase
   DISCORD_MENTIONS_FAILURES_ONLY = ENV.fetch("DISCORD_MENTIONS_FAILURES_ONLY", "false").downcase
   DISCORD_MENTIONS_ROLE_ID = ENV.fetch("DISCORD_MENTIONS_ROLE_ID", "")
@@ -19,10 +20,13 @@ class Event
   private getter event : K8S::Kubernetes::WatchEvent(K8S::Velero::V1::Backup)
   private getter notification_prefix : String
 
+
+  #Holds the Kubernetes watch event for a Velero backup.
   def initialize(@event)
     @notification_prefix = ENV.fetch("NOTIFICATION_PREFIX", "[Velero]")
   end
 
+  #The notify method checks the phase of the backup and logs the notification subject, then sends notifications to Slack, Discord, Email, and a webhook if configured
   def notify
     return unless %w[Completed Failed PartiallyFailed].includes?(phase)
 
@@ -33,30 +37,61 @@ class Event
     send_email_notification if send_email_notification?
     send_webhook_notification if send_webhook_notification?
   end
-
+  
+  # Extracts the phase of the backup from the event
   private def phase
     event.object["status"].as(Hash).fetch("phase", "Unknown")
   end
 
+
+  #Extracts the name of the backup.
   private def backup_name
     event.object["metadata"].as(Hash)["name"]
   end
 
-  def notification_subject
-    @notification_subject ||= "#{notification_prefix} Backup #{backup_name} #{phase} #{phase == "Completed" ? "✅" : "❌"}"
-  end
+  #Constructs the subject of the notification
+def notification_subject
+  # Determine the appropriate emoji based on the phase and PARTIALLY_FAILED_COUNT_AS_COMPLETED setting
+  emoji = if PARTIALLY_FAILED_COUNT_AS_COMPLETED == "true" && phase == "PartiallyFailed"
+            "✅"  # Green check mark for partially failed but considered completed
+          else
+            if phase == "Completed"
+              "✅"  # Green check mark for completed
+            else
+              "❌"  # Red cross otherwise
+            end
+          end
 
-  def notification_body
-    @notification_body ||= "Run `velero backup describe #{backup_name} --details` for more information."
-  end
+  @notification_subject ||= "#{notification_prefix} Backup #{backup_name} #{phase} #{emoji}"
+end
 
+
+  
+  #Checks if a specific type of notification (Slack, Discord, Email, Webhook) should be sent based on environment variable settings.
   def send_notification?(notification_type)
     enabled = ENV.fetch("ENABLE_#{notification_type.to_s.upcase}_NOTIFICATIONS", "false").downcase == "true"
 
-    succeeded = (phase =~ /failed/i).nil?
+   # Determine success based on phase and PARTIALLY_FAILED_COUNT_AS_COMPLETED setting
+  if phase == "PartiallyFailed"
+    @succeeded = PARTIALLY_FAILED_COUNT_AS_COMPLETED ? "true" : "false"
+  else
+    @succeeded =  (phase =~ /\bFailed\b/).nil?
+  end
+
     failures_only = ENV.fetch("#{notification_type.to_s.upcase}_FAILURES_ONLY", "false").downcase == "true"
 
-    enabled && (!failures_only || !(failures_only && succeeded))
+    enabled && (!failures_only || !(failures_only && @succeeded))
+  end
+
+  #Constructs the body of the notification
+  def notification_body
+    @notification_body ||= <<-BODY
+      Run `velero backup describe #{backup_name} --details` for more information.
+      #Debug Info:
+      #PARTIALLY_FAILED_COUNT_AS_COMPLETED: #{PARTIALLY_FAILED_COUNT_AS_COMPLETED}
+      #Phase: #{phase}
+      #Succeeded: #{@succeeded}
+    BODY
   end
 
   def send_slack_notification?
@@ -106,13 +141,17 @@ class Event
       end
 
       failures_only = DISCORD_MENTIONS_FAILURES_ONLY == "true"
-      succeeded = phase == "Completed"
+      @succeeded = phase == "Completed"
 
-      notification_mention = !failures_only || (failures_only && !succeeded) ? "<@&#{DISCORD_MENTIONS_ROLE_ID}>" : nil
+      notification_mention = !failures_only || (failures_only && !@succeeded) ? "<@&#{DISCORD_MENTIONS_ROLE_ID}>" : nil
     end
 
-    color = phase == "Completed" ? 0x36a64f : 0xa30202
-    payload = {
+      color = if PARTIALLY_FAILED_COUNT_AS_COMPLETED == "true" && phase == "PartiallyFailed"
+                0x36a64f  # Green color
+              else
+                phase == "Completed" ? 0x36a64f : 0xa30202  # Green for "Completed", red otherwise
+              end    
+      payload = {
       "content" => notification_mention.nil? ? "" : notification_mention,
       "embeds" => [
         {
