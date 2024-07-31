@@ -72,10 +72,10 @@ end
     enabled = ENV.fetch("ENABLE_#{notification_type.to_s.upcase}_NOTIFICATIONS", "false").downcase == "true"
 
    # Determine success based on phase and PARTIALLY_FAILED_COUNT_AS_COMPLETED setting
-  if phase == "PartiallyFailed"
-    @succeeded = PARTIALLY_FAILED_COUNT_AS_COMPLETED ? "true" : "false"
+  if phase == "PartiallyFailed" && PARTIALLY_FAILED_COUNT_AS_COMPLETED == "true"
+    @succeeded = "true"
   else
-    @succeeded =  (phase =~ /\bFailed\b/).nil?
+    @succeeded = (phase =~ /failed/i).nil? #if failed not found then true
   end
 
     failures_only = ENV.fetch("#{notification_type.to_s.upcase}_FAILURES_ONLY", "false").downcase == "true"
@@ -141,17 +141,23 @@ end
       end
 
       failures_only = DISCORD_MENTIONS_FAILURES_ONLY == "true"
-      @succeeded = phase == "Completed"
+      succeeded = phase == "Completed"
 
-      notification_mention = !failures_only || (failures_only && !@succeeded) ? "<@&#{DISCORD_MENTIONS_ROLE_ID}>" : nil
+      notification_mention = !failures_only || (failures_only && !succeeded) ? "<@&#{DISCORD_MENTIONS_ROLE_ID}>" : nil
     end
 
-      color = if PARTIALLY_FAILED_COUNT_AS_COMPLETED == "true" && phase == "PartiallyFailed"
-                0x36a64f  # Green color
-              else
-                phase == "Completed" ? 0x36a64f : 0xa30202  # Green for "Completed", red otherwise
-              end    
-      payload = {
+    #color = phase == "Completed" ? 0x36a64f : 0xa30202
+    if PARTIALLY_FAILED_COUNT_AS_COMPLETED == "true" && phase == "PartiallyFailed"
+      color = 0x36a64f  # Green 
+    else
+      if phase == "Completed"
+        color = 0x36a64f  # Green 
+      else
+        color = 0xa30202  # Red 
+      end
+    end
+
+    payload = {
       "content" => notification_mention.nil? ? "" : notification_mention,
       "embeds" => [
         {

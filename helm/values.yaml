@@ -12,7 +12,7 @@ slack:
 discord:
   enabled: false
   failures_only: false
-  webhook: "https://discord.com/api/webhooks/1267393565131280434/1c5vBQoZEWD3nTfYlpiCrOhGyvZ0PIhXqK0_nPkwLvcyPHeH5S8pgM4gNJQuvJEREsiB"
+  webhook: ""
   mentions:
     enabled: false
     failures_only: true
@@ -35,6 +35,6 @@ webhook:
   failures_only: false
   url: "https://...."
 
-velero_namespace: filip-velero
+velero_namespace: velero
 partially_failed_count_as_completed: false
 notification_prefix: "[Velero] "

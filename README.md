@@ -1,9 +1,7 @@
 ## Disclaimer 
-
 This repository is a fork originally created from [vitobotta](https://github.com/vitobotta/velero-notifications). Later [wout-o](https://github.com/wout-o/velero-notifications) added feature for discord webhooks.
 
 # velero-notifications
-
 This is a simple Kubernetes controller written in Crystal that sends Email/Slack/Discord/webhook notifications when backups are performed by [Velero](https://velero.io/) in a [Kubernetes](https://kubernetes.io/) cluster.
 
 ![Screenshot](slack.png?raw=true "Screenshot")
@@ -12,17 +10,18 @@ This is a simple Kubernetes controller written in Crystal that sends Email/Slack
 
 
 ## Installation
-
 1. Clone the repo
 2. Install with Helm 
 
-Don't forget to change namespace && velero_namespace to your values.
+Don't forget to change namespace && velero_namespace to your values. 
+#### NOTE: Namespace where velero-backup-notification is installed HAS to be same as namespace, where velero is installed!
 
 ```bash
 helm upgrade --install \
   --namespace velero \
   --set velero_namespace=velero \
   --set notification_prefix="[Velero]" \
+  --set partially_failed_count_as_completed="false" \
   --set slack.enabled=true \
   --set slack.failures_only=false \
   --set slack.webhook=https://... \
@@ -32,7 +31,7 @@ helm upgrade --install \
   --set discord.failures_only=false \
   --set discord.webhook=https://... \
   --set discord.mentions.enabled=false \
-  --set discord.mentions.failures_only=true \
+  --set discord.mentions.failures_only=false \
   --set discord.mentions.role_id="1234567890" \
   --set email.enabled=true \
   --set email.failures_only=true \
@@ -48,7 +47,13 @@ helm upgrade --install \
   velero-backup-notification ./helm
 ```
 
-That's it! You should now receive notifications when a backup is completed or fails. It couldn't be simpler than that!
+
+## Different options explained
+#### *.failures_only
+* when set to true (default false), notifications of backups with status "Completed" are not send/received.
+
+#### Partially_failed_count_as_completed
+* when set to true (default false), backups with status "PartiallyFailed" are perceived as completed. This means that no notifications are send/received when the option *.failures_only is set to true."
 
 
 ## Quick guide on how to integrate with
