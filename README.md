@@ -1,5 +1,5 @@
 ## Disclaimer 
-This repository is a fork originally created from [vitobotta](https://github.com/vitobotta/velero-notifications). Later [wout-o](https://github.com/wout-o/velero-notifications) added feature for discord webhooks.
+This repository is a fork originally created project by [andagabr](https://github.com/andragabr/velero-backup-notification). Later [vitobotta](https://github.com/vitobotta/velero-notifications) rewrite the code in Crystal. And finally [wout-o](https://github.com/wout-o/velero-notifications) added feature for discord webhooks.
 
 # velero-notifications
 This is a simple Kubernetes controller written in Crystal that sends Email/Slack/Discord/webhook notifications when backups are performed by [Velero](https://velero.io/) in a [Kubernetes](https://kubernetes.io/) cluster.
@@ -7,7 +7,6 @@ This is a simple Kubernetes controller written in Crystal that sends Email/Slack
 ![Screenshot](slack.png?raw=true "Screenshot")
 
 ![Screenshot](discord.png?raw=true "Screenshot")
-
 
 ## Installation
 1. Clone the repo
