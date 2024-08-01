@@ -13,7 +13,7 @@ This is a simple Kubernetes controller written in Crystal that sends Email/Slack
 2. Install with Helm 
 
 Don't forget to change namespace && velero_namespace to your values. 
-#### NOTE: Namespace where velero-backup-notification is installed HAS to be same as namespace, where velero is installed!
+#### NOTE: Velero-backup-notification namespace HAS to be same as velero namespace!! 
 
 ```bash
 helm upgrade --install \
